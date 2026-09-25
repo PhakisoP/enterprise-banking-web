@@ -12,3 +12,51 @@ export async function getAccount(accountNumber) {
 
     return response.json()
 }
+
+export async function getTransactions(accountNumber) {
+    const response = await fetch(
+        `${API_BASE_URL}/accounts/${accountNumber}/transactions`,
+    )
+
+    if (!response.ok) {
+        throw new Error(`Unable to load transactions: ${response.status}`)
+    }
+
+    return response.json()
+}
+
+export async function deposit(accountNumber, amount) {
+    const response = await fetch(
+        `${API_BASE_URL}/accounts/${accountNumber}/deposits`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ amount }),
+        },
+    )
+
+    if (!response.ok) {
+        const problem = await response.json()
+        throw new Error(problem.detail || 'Deposit failed')
+    }
+}
+
+export async function withdraw(accountNumber, amount) {
+    const response = await fetch(
+        `${API_BASE_URL}/accounts/${accountNumber}/withdrawals`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ amount }),
+        },
+    )
+
+    if (!response.ok) {
+        const problem = await response.json()
+        throw new Error(problem.detail || 'Withdrawal failed')
+    }
+}
