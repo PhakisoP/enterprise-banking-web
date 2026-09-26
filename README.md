@@ -1,16 +1,47 @@
-# React + Vite
+# Enterprise Banking Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Responsive React and Vite dashboard for viewing account balances and transaction activity, making deposits and withdrawals, printing statements, and transferring funds.
 
-Currently, two official plugins are available:
+## Configuration
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Create a local `.env.local` file for development:
 
-## React Compiler
+```dotenv
+VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_ACCOUNT_NUMBER=your-account-number
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The API URL defaults to the local development server while running Vite. Production builds require `VITE_API_BASE_URL` and `VITE_ACCOUNT_NUMBER` to be set in the deployment environment. Only non-secret configuration belongs in `VITE_` variables because Vite includes them in the browser bundle.
 
-## Expanding the ESLint configuration
+## Run locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```sh
+npm install
+npm run dev
+```
+
+## Verification
+
+```sh
+npm test
+npm run lint
+npm run build
+```
+
+`npm test` runs the Node.js built-in tests for statement period filtering and transfer input validation. The production build is written to `dist/`.
+
+## Banking API
+
+The web app reads account details and transaction history from the configured API. Deposits and withdrawals use the account action endpoints. Transfers use:
+
+```http
+POST /api/v1/accounts/{sourceAccountNumber}/transfers
+Content-Type: application/json
+
+{
+  "destinationAccountNumber": 123456,
+  "amount": 250.00
+}
+```
+
+The API records a debit on the source account and a credit on the destination account in one database transaction. The statement period is filtered from the account transaction history returned by the API; printing opens the browser’s print dialog for the selected period.

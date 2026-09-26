@@ -1,8 +1,10 @@
 import { useState } from 'react'
 
-function DepositForm({ onSubmit, onCancel, submitting, error }) {
+function DepositForm({ action = 'deposit', onSubmit, onCancel, submitting, error }) {
     const [amount, setAmount] = useState('')
     const [validationError, setValidationError] = useState(null)
+    const isWithdrawal = action === 'withdrawal'
+    const actionLabel = isWithdrawal ? 'Withdrawal' : 'Deposit'
 
     function handleSubmit(event) {
         event.preventDefault()
@@ -10,12 +12,12 @@ function DepositForm({ onSubmit, onCancel, submitting, error }) {
         const numericAmount = Number(amount)
 
         if (!amount || Number.isNaN(numericAmount)) {
-            setValidationError('Please enter a valid deposit amount.')
+            setValidationError(`Please enter a valid ${actionLabel.toLowerCase()} amount.`)
             return
         }
 
         if (numericAmount <= 0) {
-            setValidationError('Deposit amount must be greater than zero.')
+            setValidationError(`${actionLabel} amount must be greater than zero.`)
             return
         }
 
@@ -25,11 +27,11 @@ function DepositForm({ onSubmit, onCancel, submitting, error }) {
 
     return (
         <div className="modal-backdrop">
-            <div className="modal">
+            <div className="modal" role="dialog" aria-modal="true" aria-labelledby="transaction-form-title">
                 <div className="modal-header">
                     <div>
                         <span className="section-label">Account</span>
-                        <h2>Make a Deposit</h2>
+                        <h2 id="transaction-form-title">Make a {actionLabel}</h2>
                     </div>
 
                     <button
@@ -37,7 +39,7 @@ function DepositForm({ onSubmit, onCancel, submitting, error }) {
                         className="modal-close"
                         onClick={onCancel}
                         disabled={submitting}
-                        aria-label="Close deposit form"
+                        aria-label={`Close ${actionLabel.toLowerCase()} form`}
                     >
                         ×
                     </button>
@@ -45,15 +47,15 @@ function DepositForm({ onSubmit, onCancel, submitting, error }) {
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="deposit-amount">
-                            Deposit amount
+                        <label htmlFor="transaction-amount">
+                            {actionLabel} amount
                         </label>
 
                         <div className="amount-input">
                             <span>R</span>
 
                             <input
-                                id="deposit-amount"
+                                id="transaction-amount"
                                 type="number"
                                 min="0.01"
                                 step="0.01"
@@ -95,7 +97,7 @@ function DepositForm({ onSubmit, onCancel, submitting, error }) {
                             type="submit"
                             disabled={submitting}
                         >
-                            {submitting ? 'Processing...' : 'Deposit'}
+                            {submitting ? 'Processing...' : actionLabel}
                         </button>
                     </div>
                 </form>

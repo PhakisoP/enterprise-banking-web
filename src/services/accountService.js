@@ -1,13 +1,42 @@
-const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
+const API_BASE_URL = (
+    configuredApiBaseUrl ||
+    (import.meta.env.DEV ? 'http://localhost:8080/api/v1' : '')
+).replace(/\/+$/, '')
+
+function accountEndpoint(accountNumber, resource = '') {
+    if (!API_BASE_URL) {
+        throw new Error('Banking API is not configured. Set VITE_API_BASE_URL for this deployment.')
+    }
+
+    if (!accountNumber) {
+        throw new Error('Account number is not configured. Set VITE_ACCOUNT_NUMBER.')
+    }
+
+    return `${API_BASE_URL}/accounts/${encodeURIComponent(accountNumber)}${resource}`
+}
+
+async function throwResponseError(response, fallbackMessage) {
+    let problem
+
+    try {
+        problem = await response.json()
+    } catch {
+        // Some API errors have an empty or non-JSON response body.
+    }
+
+    throw new Error(
+        problem?.detail || problem?.message || `${fallbackMessage} (${response.status})`,
+    )
+}
 
 export async function getAccount(accountNumber) {
     const response = await fetch(
-        `${API_BASE_URL}/accounts/${accountNumber}`,
+        accountEndpoint(accountNumber),
     )
 
     if (!response.ok) {
-        throw new Error(`Unable to load account: ${response.status}`)
+        await throwResponseError(response, 'Unable to load account')
     }
 
     return response.json()
@@ -15,11 +44,11 @@ export async function getAccount(accountNumber) {
 
 export async function getTransactions(accountNumber) {
     const response = await fetch(
-        `${API_BASE_URL}/accounts/${accountNumber}/transactions`,
+        accountEndpoint(accountNumber, '/transactions'),
     )
 
     if (!response.ok) {
-        throw new Error(`Unable to load transactions: ${response.status}`)
+        await throwResponseError(response, 'Unable to load transactions')
     }
 
     return response.json()
@@ -27,7 +56,7 @@ export async function getTransactions(accountNumber) {
 
 export async function deposit(accountNumber, amount) {
     const response = await fetch(
-        `${API_BASE_URL}/accounts/${accountNumber}/deposits`,
+        accountEndpoint(accountNumber, '/deposits'),
         {
             method: 'POST',
             headers: {
@@ -38,14 +67,13 @@ export async function deposit(accountNumber, amount) {
     )
 
     if (!response.ok) {
-        const problem = await response.json()
-        throw new Error(problem.detail || 'Deposit failed')
+        await throwResponseError(response, 'Deposit failed')
     }
 }
 
 export async function withdraw(accountNumber, amount) {
     const response = await fetch(
-        `${API_BASE_URL}/accounts/${accountNumber}/withdrawals`,
+        accountEndpoint(accountNumber, '/withdrawals'),
         {
             method: 'POST',
             headers: {
@@ -56,7 +84,23 @@ export async function withdraw(accountNumber, amount) {
     )
 
     if (!response.ok) {
-        const problem = await response.json()
-        throw new Error(problem.detail || 'Withdrawal failed')
+        await throwResponseError(response, 'Withdrawal failed')
+    }
+}
+
+export async function transfer(accountNumber, destinationAccountNumber, amount) {
+    const response = await fetch(
+        accountEndpoint(accountNumber, '/transfers'),
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ destinationAccountNumber, amount }),
+        },
+    )
+
+    if (!response.ok) {
+        await throwResponseError(response, 'Transfer failed')
     }
 }
