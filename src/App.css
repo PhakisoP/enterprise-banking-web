@@ -586,6 +586,11 @@ a {
   border-bottom: 1px solid #e7ecf2;
 }
 
+.transaction-history-header > :nth-child(3),
+.transaction-history-header > :nth-child(4) {
+  text-align: right;
+}
+
 .transaction-history-row:last-child {
   border-bottom: none;
 }
