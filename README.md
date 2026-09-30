@@ -45,3 +45,35 @@ Content-Type: application/json
 ```
 
 The API records a debit on the source account and a credit on the destination account in one database transaction. The statement period is filtered from the account transaction history returned by the API; printing opens the browser’s print dialog for the selected period.
+
+## UI Screenshots
+
+The screenshots below show the banking dashboard and its core account and transaction flows.
+
+### Dashboard
+
+![Dashboard overview](docs/screenshots/dashboard-overview.png)
+
+### Accounts
+
+![Accounts overview](docs/screenshots/accounts-overview.png)
+
+### Transaction history
+
+![Transaction history](docs/screenshots/transaction-history.png)
+
+### Transfer funds
+
+![Transfer funds dialog](docs/screenshots/transfer-dialog.png)
+
+### Deposit
+
+![Deposit dialog](docs/screenshots/deposit-dialog.png)
+
+### Withdrawal
+
+![Withdrawal dialog](docs/screenshots/withdrawal-dialog.png)
+
+### Dashboard after transfer
+
+![Dashboard after transfer](docs/screenshots/dashboard-after-transfer.png)

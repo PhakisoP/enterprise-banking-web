@@ -26,7 +26,9 @@ function App() {
   const [currentView, setCurrentView] = useState(
       window.location.hash === '#transactions'
           ? 'transactions'
-          : 'dashboard',
+          : window.location.hash === '#accounts'
+              ? 'accounts'
+              : 'dashboard',
   )
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
@@ -116,7 +118,9 @@ function App() {
       setCurrentView(
           window.location.hash === '#transactions'
               ? 'transactions'
-              : 'dashboard',
+              : window.location.hash === '#accounts'
+                  ? 'accounts'
+                  : 'dashboard',
       )
     }
 
@@ -128,7 +132,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!loading && currentView === 'dashboard' && window.location.hash === '#accounts') {
+    if (!loading && currentView === 'accounts' && window.location.hash === '#accounts') {
       document.getElementById('accounts')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [currentView, loading])
@@ -291,7 +295,7 @@ function App() {
               Personal Banking
             </span>
 
-              <h1>Dashboard</h1>
+              <h1>{currentView === 'accounts' ? 'Accounts' : 'Dashboard'}</h1>
             </div>
 
             <div className="profile">
@@ -387,7 +391,7 @@ function App() {
 
               <div className="summary-row">
                 <span>Account Type</span>
-                <strong>Current Account</strong>
+                <strong>{account?.accountType || '—'}</strong>
               </div>
 
               <div className="summary-row">
