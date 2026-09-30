@@ -17,6 +17,11 @@ function accountEndpoint(accountNumber, resource = '') {
 }
 
 async function throwResponseError(response, fallbackMessage) {
+    // Keep internal server details out of user-facing errors.
+    if (response.status >= 500) {
+        throw new Error(`${fallbackMessage} (${response.status})`)
+    }
+
     let problem
 
     try {
